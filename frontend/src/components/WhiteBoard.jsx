@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useCanvas } from "../providers/Canvas";
 import DrawingCanvas from "./DrawingCanvas";
-import Toolbar from "./Toolbar";
+import Toolbar from "./ToolBar";
 import axiosInstance from "../utils/axios";
 import UserCursors from "./UserCursors";
 
