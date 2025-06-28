@@ -19,6 +19,10 @@ export const CanvasProvider = ({ children }) => {
   const [color, setColor] = useState("black");
   const [lineWidth, setLineWidth] = useState(2);
   const [roomId, setRoomId] = useState("default123");
+  const [username, setUserName] = useState(
+    localStorage.getItem("liveboard-user") || "John Doe"
+  );
+  const [openModal, setOpenModal] = useState(true);
 
   const value = useMemo(
     () => ({
@@ -30,8 +34,12 @@ export const CanvasProvider = ({ children }) => {
       setLineWidth,
       roomId,
       setRoomId,
+      username,
+      setUserName,
+      openModal,
+      setOpenModal,
     }),
-    [color, lineWidth, roomId]
+    [color, lineWidth, roomId, username, openModal]
   );
 
   return (

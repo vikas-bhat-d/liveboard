@@ -1,4 +1,3 @@
-// socket/socketHandler.js
 const Room = require("../models/Room");
 
 module.exports = function (io) {
@@ -15,8 +14,8 @@ module.exports = function (io) {
       console.log(`User ${socket.id} left room ${roomId}`);
     });
 
-    socket.on("cursor-move", ({ roomId, x, y }) => {
-      socket.to(roomId).emit("cursor-move", { id: socket.id, x, y });
+    socket.on("cursor-move", ({ roomId, x, y, username }) => {
+      socket.to(roomId).emit("cursor-move", { id: socket.id, x, y, username });
     });
 
     socket.on("draw-start", async ({ roomId, ...data }) => {
@@ -24,18 +23,43 @@ module.exports = function (io) {
       await Room.findOneAndUpdate(
         { roomId },
         {
-          $push: { drawingData: { type: "stroke", data } },
+          $push: { drawingData: { type: "start", data } },
           $set: { lastActivity: new Date() },
         }
       );
     });
 
-    socket.on("draw-move", ({ roomId, ...data }) => {
+    socket.on("draw-move", async ({ roomId, ...data }) => {
       socket.to(roomId).emit("draw-move", data);
+      // await Room.findOneAndUpdate(
+      //   { roomId },
+      //   {
+      //     $push: { drawingData: { type: "stroke", data } },
+      //     $set: { lastActivity: new Date() },
+      //   }
+      // );
     });
 
-    socket.on("draw-end", ({ roomId }) => {
+    socket.on("draw-end", async ({ roomId, strokes }) => {
       socket.to(roomId).emit("draw-end");
+      const formattedData = strokes.map(({ type, x, y, color, lineWidth }) => ({
+        type,
+        data: { x, y, color, lineWidth },
+      }));
+      if (strokes.length <= 0) return;
+      await Room.findOneAndUpdate(
+        { roomId: strokes[0].roomId },
+        {
+          $push: {
+            drawingData: {
+              $each: formattedData,
+            },
+          },
+          $set: {
+            lastActivity: new Date(),
+          },
+        }
+      );
     });
 
     socket.on("clear-canvas", async (roomId) => {
