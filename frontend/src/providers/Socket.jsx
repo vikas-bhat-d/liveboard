@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 
 import { io } from "socket.io-client";
-const server = "http://localhost:8000";
+const server = "https://liveboard-0pnz.onrender.com";
 
 const SocketContext = React.createContext(null);
 
